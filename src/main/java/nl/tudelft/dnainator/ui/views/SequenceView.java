@@ -1,17 +1,10 @@
 package nl.tudelft.dnainator.ui.views;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javafx.geometry.Point2D;
-import nl.tudelft.dnainator.core.SequenceNode;
-import nl.tudelft.dnainator.core.impl.Edge;
-import nl.tudelft.dnainator.graph.impl.Neo4jSingleton;
-import nl.tudelft.dnainator.ui.drawables.DrawableEdge;
 import nl.tudelft.dnainator.ui.drawables.DrawableNode;
-import nl.tudelft.dnainator.ui.layouts.TopoLayout;
 import nl.tudelft.dnainator.ui.models.GraphModel;
+import nl.tudelft.dnainator.ui.models.GraphItem;
 
 /**
  * The SequenceView views the data from the sequence height, i.e.
@@ -27,20 +20,21 @@ public class SequenceView extends View {
 	public SequenceView(GraphModel model) {
 		super(model);
 
-		drawableNodes = new HashMap<>();
+//		drawableNodes = new HashMap<>();
 
 		getStyleClass().add("sequence-view");
+		getChildren().add(new GraphItem());
 	}
 
 	@Override
 	public void redraw() {
 		System.out.println("Redrawing...");
-		//drawGraph();
-
-		drawNodes();
-		drawEdges();
-
-		group.getChildren().addAll(drawableNodes.values());
+		
+//		drawGraph();
+//		drawNodes();
+//		drawEdges();
+//		group.getChildren().addAll(drawableNodes.values());
+		
 		System.out.println("Done!");
 	}
 
@@ -60,31 +54,31 @@ public class SequenceView extends View {
 //			group.getChildren().addAll(src, dst, de);
 //		}
 //	}
-
-	private void drawNodes() {
-		List<List<SequenceNode>> ranks = model.getRanks();
-		for (int i = 0; i < ranks.size(); i++) {
-			List<SequenceNode> nodes = ranks.get(i);
-			int size = nodes.size();
-			for (int j = 0; j < size; j++) {
-				Point2D coords = TopoLayout.transform(i, size, j);
-				SequenceNode n = nodes.get(j);
-
-				DrawableNode drawable = new DrawableNode(n, coords.getX(), coords.getY());
-				drawableNodes.put(n.getId(), drawable);
-			}
-		}
-	}
-
-	private void drawEdges() {
-		for (Edge<String> e : Neo4jSingleton.getInstance().getDatabase().getEdges()) {
-			DrawableNode src = drawableNodes.get(e.getSource());
-			DrawableNode dst = drawableNodes.get(e.getDest());
-			if (src == null || dst == null) {
-				continue;
-			}
-			DrawableEdge de = new DrawableEdge(src, dst);
-			group.getChildren().add(de);
-		}
-	}
+//
+//	private void drawNodes() {
+//		List<List<SequenceNode>> ranks = model.getRanks();
+//		for (int i = 0; i < ranks.size(); i++) {
+//			List<SequenceNode> nodes = ranks.get(i);
+//			int size = nodes.size();
+//			for (int j = 0; j < size; j++) {
+//				Point2D coords = TopoLayout.transform(i, size, j);
+//				SequenceNode n = nodes.get(j);
+//
+//				DrawableNode drawable = new DrawableNode(n, coords.getX(), coords.getY());
+//				drawableNodes.put(n.getId(), drawable);
+//			}
+//		}
+//	}
+//
+//	private void drawEdges() {
+//		for (Edge<String> e : Neo4jSingleton.getInstance().getDatabase().getEdges()) {
+//			DrawableNode src = drawableNodes.get(e.getSource());
+//			DrawableNode dst = drawableNodes.get(e.getDest());
+//			if (src == null || dst == null) {
+//				continue;
+//			}
+//			DrawableEdge de = new DrawableEdge(src, dst);
+//			group.getChildren().add(de);
+//		}
+//	}
 }
