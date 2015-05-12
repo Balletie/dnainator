@@ -21,12 +21,15 @@ public class SequenceView extends View {
 		scale = new Scale();
 
 		ModelItem mi = new GraphItem();
+		mi.setTranslateX(400);
+		mi.setTranslateY(400);
 		mi.getTransforms().add(scale);
 		
 		setOnScroll(ev -> {
-			scale.setX(scale.getX() + (scale.getX() / ev.getDeltaY()));
-			scale.setY(scale.getY() + (scale.getX() / ev.getDeltaY()));
-			System.out.println("view: " + getLayoutBounds());
+			scale.setX(scale.getX() + (scale.getX() * ev.getDeltaY() / 1000));
+			scale.setY(scale.getY() + (scale.getX() * ev.getDeltaY() / 1000));
+			System.out.println("scale: " + scale);
+			System.out.println("view:  " + getLayoutBounds());
 			mi.update(getLayoutBounds());
 		});
 		

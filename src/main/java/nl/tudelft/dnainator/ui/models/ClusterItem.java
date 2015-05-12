@@ -8,8 +8,7 @@ public class ClusterItem extends ModelItem {
 	public ClusterItem() {
 		super((Neo4jGraph) null);
 		
-		Circle c = new Circle(20, Color.BLUE);
-		c.setTranslateY(100);
-		getChildren().add(c);
+		setContent(new Circle(20, Color.BLUE));
+		getChildren().add(getContent());
 	}
 }
