@@ -30,9 +30,4 @@ public abstract class View extends HBox {
 		setAlignment(Pos.CENTER);
 		getStyleClass().add("view");
 	}
-
-	/**
-	 * Redraws this view's contents.
-	 */
-	public abstract void redraw();
 }

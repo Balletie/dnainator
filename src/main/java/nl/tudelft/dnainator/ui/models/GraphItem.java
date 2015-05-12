@@ -1,36 +1,28 @@
 package nl.tudelft.dnainator.ui.models;
 
-import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
+import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
 
 public class GraphItem extends ModelItem {
 	public GraphItem() {
 		super((Neo4jGraph) null);
 		
-		Circle c; Rectangle r;
-		r = new Rectangle(1000, 20, Color.BLACK);
-		getChildren().add(r);
+		ModelItem mi;
+		mi = new ClusterItem();
+		mi.setTranslateX(200);
+		children.add(mi);
+		mi = new ClusterItem();
+		mi.setTranslateX(400);
+		children.add(mi);
+		mi = new ClusterItem();
+		mi.setTranslateX(600);
+		children.add(mi);
+		mi = new ClusterItem();
+		mi.setTranslateX(800);
+		children.add(mi);
 		
-		c = new Circle(20, Color.BLUE);
-		c.setTranslateX(0);
-		c.setTranslateY(100);
-		getChildren().add(c);
-		
-		c = new Circle(20, Color.BLUE);
-		c.setTranslateX(350);
-		c.setTranslateY(100);
-		getChildren().add(c);
-		
-		c = new Circle(20, Color.BLUE);
-		c.setTranslateX(650);
-		c.setTranslateY(100);
-		getChildren().add(c);
-		
-		c = new Circle(20, Color.BLUE);
-		c.setTranslateX(1000);
-		c.setTranslateY(100);
-		getChildren().add(c);
+		getChildren().add(new Rectangle(1000, 20, Color.BLACK));
+		getChildren().addAll(children);
 	}
 }
