@@ -34,7 +34,7 @@ public class ViewController {
 		scale.setX(scale.getX() + (scale.getX() * e.getDeltaY() / 1000));
 		scale.setY(scale.getY() + (scale.getX() * e.getDeltaY() / 1000));
 		System.out.println("view:  " + view.getLayoutBounds());
-		mi.update(view.getLayoutBounds());
+		mi.update();
 	}
 
 }

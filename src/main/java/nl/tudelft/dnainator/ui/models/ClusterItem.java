@@ -27,11 +27,26 @@ public class ClusterItem extends ModelItem {
 		rootToItem.bind(transform);
 
 		setContent(new Circle(20, Color.BLUE));
-		getChildren().add(getContent());
+		
+		ModelItem mi;
+		mi = new SequenceItem(rootToItem);
+		mi.setTranslateX(0);
+		getChildItems().add(mi);
+		mi = new SequenceItem(rootToItem);
+		mi.setTranslateX(100);
+		getChildItems().add(mi);
+		mi = new SequenceItem(rootToItem);
+		mi.setTranslateX(200);
+		getChildItems().add(mi);
 	}
 
 	@Override
 	public Transform getRootToItem() {
 		return rootToItem.get();
+	}
+	
+	@Override
+	public void update() {
+		update(300);
 	}
 }
