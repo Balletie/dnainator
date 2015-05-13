@@ -1,32 +1,41 @@
 package nl.tudelft.dnainator.ui.views;
 
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
-import javafx.scene.layout.Pane;
-import nl.tudelft.dnainator.ui.models.GraphModel;
+import javafx.scene.layout.Region;
+import javafx.scene.transform.Scale;
+import nl.tudelft.dnainator.ui.models.GraphItem;
+import nl.tudelft.dnainator.ui.models.ModelItem;
 
 /**
- * This abstract class is the View part of the MVC pattern.
- * <p>
- * Each extending class defines its own view on the data.
- * </p>
+ * This class is the View part of the MVC pattern.
  */
-public abstract class View extends Pane {
-	private static final int L_PADDING = 20;
-	protected GraphModel model;
-	protected Group group;
+public class View extends Region {
+	private Group group;
+	private Scale scale;
 
 	/**
 	 * Creates a new view instance.
-	 * @param model The {@link GraphModel} whose data to display.
 	 */
-	public View(GraphModel model) {
-		this.model = model;
+	public View() {
 		this.group = new Group();
+		this.scale = new Scale();
 
 		getChildren().add(this.group);
-		setPadding(new Insets(0, 0, 0, L_PADDING));
 		getStyleClass().add("view");
+
+		ModelItem mi = new GraphItem();
+		mi.setTranslateX(400);
+		mi.setTranslateY(400);
+		mi.getTransforms().add(scale);
+
+		setOnScroll(ev -> {
+			scale.setX(scale.getX() + (scale.getX() * ev.getDeltaY() / 1000));
+			scale.setY(scale.getY() + (scale.getX() * ev.getDeltaY() / 1000));
+			System.out.println("scale: " + scale);
+			System.out.println("view:  " + getLayoutBounds());
+			mi.update(getLayoutBounds());
+		});
+
+		getChildren().add(mi);
 	}
 }
