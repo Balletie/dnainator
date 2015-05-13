@@ -1,41 +1,31 @@
 package nl.tudelft.dnainator.ui.views;
 
-import javafx.scene.Group;
-import javafx.scene.layout.Region;
-import javafx.scene.transform.Scale;
-import nl.tudelft.dnainator.ui.models.GraphItem;
-import nl.tudelft.dnainator.ui.models.ModelItem;
+import java.io.IOException;
+
+import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.Pane;
+import nl.tudelft.dnainator.ui.widgets.ExceptionDialog;
 
 /**
  * This class is the View part of the MVC pattern.
  */
-public class View extends Region {
-	private Group group;
-	private Scale scale;
-
+public class View extends Pane {
 	/**
 	 * Creates a new view instance.
 	 */
 	public View() {
-		this.group = new Group();
-		this.scale = new Scale();
-
-		getChildren().add(this.group);
+		loadFXML();
 		getStyleClass().add("view");
+	}
 
-		ModelItem mi = new GraphItem();
-		mi.setTranslateX(400);
-		mi.setTranslateY(400);
-		mi.getTransforms().add(scale);
+	private void loadFXML() {
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/ui/fxml/view.fxml"));
+		fxmlLoader.setRoot(this);
 
-		setOnScroll(ev -> {
-			scale.setX(scale.getX() + (scale.getX() * ev.getDeltaY() / 1000));
-			scale.setY(scale.getY() + (scale.getX() * ev.getDeltaY() / 1000));
-			System.out.println("scale: " + scale);
-			System.out.println("view:  " + getLayoutBounds());
-			mi.update(getLayoutBounds());
-		});
-
-		getChildren().add(mi);
+		try {
+			fxmlLoader.load();
+		} catch (IOException e) {
+			new ExceptionDialog(e, "Can not load the View!");
+		}
 	}
 }
