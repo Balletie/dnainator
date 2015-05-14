@@ -28,8 +28,9 @@ public class ViewController {
 	@FXML
 	private void initialize() {
 		translate = new Translate(400, 400);
-		scale = new Scale();
 		translate.setOnTransformChanged(e -> worldToLocal = translate.createConcatenation(scale));
+
+		scale = new Scale();
 		scale.setOnTransformChanged(e -> worldToLocal = translate.createConcatenation(scale));
 
 		mi = new GraphItem();

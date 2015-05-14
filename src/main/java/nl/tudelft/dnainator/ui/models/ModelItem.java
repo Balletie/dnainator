@@ -58,6 +58,14 @@ public abstract class ModelItem extends Pane {
 	}
 
 	/**
+	 * Return the underlying graph of this {@link ModelItem}.
+	 * @return	the underlying graph
+	 */
+	public Graph getGraph() {
+		return graph;
+	}
+
+	/**
 	 * Return the concatenation of transforms from the root to this item.
 	 * @return	a concatenation of transforms
 	 */
