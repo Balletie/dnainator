@@ -1,14 +1,16 @@
 package nl.tudelft.dnainator.ui.models;
 
+import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Translate;
 import nl.tudelft.dnainator.graph.impl.Neo4jSingleton;
 
 public class GraphItem extends CompositeItem {
 	public GraphItem() {
 		super(Neo4jSingleton.getInstance().getDatabase());
 
-		rootToItemProperty().bind(localToParentTransformProperty());
+		rootToItemProperty().set(new Translate());
 
 		setContent(new Rectangle(1000, 20, Color.BLACK));
 
@@ -28,7 +30,7 @@ public class GraphItem extends CompositeItem {
 	}
 
 	@Override
-	public void update() {
-		update(300);
+	public void update(Bounds b) {
+		update(b, 1000);
 	}
 }

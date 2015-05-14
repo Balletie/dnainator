@@ -2,6 +2,7 @@ package nl.tudelft.dnainator.ui.models;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.transform.Transform;
@@ -14,6 +15,7 @@ public class ClusterItem extends CompositeItem {
 		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
 			{
 				super.bind(parent);
+				super.bind(localToParentTransformProperty());
 			}
 			@Override
 			protected Transform computeValue() {
@@ -40,7 +42,7 @@ public class ClusterItem extends CompositeItem {
 	}
 
 	@Override
-	public void update() {
-		update(1000);
+	public void update(Bounds b) {
+		update(b, 300);
 	}
 }

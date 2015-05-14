@@ -3,6 +3,7 @@ package nl.tudelft.dnainator.ui.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.geometry.Bounds;
 import javafx.scene.Group;
 import javafx.scene.shape.Rectangle;
 import nl.tudelft.dnainator.graph.Graph;
@@ -35,8 +36,8 @@ public abstract class CompositeItem extends ModelItem {
 		this.children = childItems;
 	}
 
-	protected void update(double threshold) {
-		if (localToRoot(new Rectangle(100, 1).getBoundsInLocal()).getWidth() < threshold) {
+	protected void update(Bounds b, double threshold) {
+		if (b.getWidth() > threshold) {
 			getContent().setVisible(true);
 			getChildRoot().getChildren().clear();
 		} else {
@@ -44,7 +45,7 @@ public abstract class CompositeItem extends ModelItem {
 			getChildRoot().getChildren().clear(); // FIXME
 			getChildRoot().getChildren().addAll(getChildItems());
 			for (ModelItem m : children) {
-				m.update();
+				m.update(b);
 			}
 		}
 	}

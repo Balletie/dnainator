@@ -96,6 +96,7 @@ public abstract class ModelItem extends Pane {
 	 * and then dynamically adds and deletes items in the JavaFX scene graph.
 	 *
 	 * TODO: check whether something is visible in the viewport!
+	 * @param b	the bounds of the viewport to update
 	 */
-	public abstract void update();
+	public abstract void update(Bounds b);
 }

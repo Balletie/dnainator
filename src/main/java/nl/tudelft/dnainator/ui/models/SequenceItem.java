@@ -2,8 +2,12 @@ package nl.tudelft.dnainator.ui.models;
 
 import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Transform;
 import nl.tudelft.dnainator.graph.impl.Neo4jSingleton;
 
@@ -15,6 +19,7 @@ public class SequenceItem extends ModelItem {
 		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
 			{
 				super.bind(parent);
+				super.bind(localToParentTransformProperty());
 			}
 			@Override
 			protected Transform computeValue() {
@@ -27,8 +32,7 @@ public class SequenceItem extends ModelItem {
 	}
 
 	@Override
-	public void update() {
-		// TODO Auto-generated method stub
-
+	public void update(Bounds b) {
+		System.out.println(localToRoot(new Rectangle().getBoundsInLocal()));
 	}
 }

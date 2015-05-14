@@ -1,12 +1,16 @@
 package nl.tudelft.dnainator.ui.controllers;
 
+import javafx.fxml.FXML;
+import javafx.geometry.Bounds;
+import javafx.scene.Group;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.transform.NonInvertibleTransformException;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
+import javafx.scene.transform.Translate;
 import nl.tudelft.dnainator.ui.models.GraphItem;
 import nl.tudelft.dnainator.ui.models.ModelItem;
 import nl.tudelft.dnainator.ui.views.View;
-import javafx.fxml.FXML;
-import javafx.scene.Group;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.transform.Scale;
 
 /**
  * Controller class for all graph interaction.
@@ -14,18 +18,23 @@ import javafx.scene.transform.Scale;
 public class ViewController {
 	@FXML private View view;
 	@FXML private Group group;
+
 	private Scale scale;
+	private Translate translate;
+	private Transform worldToLocal;
+
 	private ModelItem mi;
 
 	@FXML
 	private void initialize() {
-		this.scale = new Scale();
+		translate = new Translate(400, 400);
+		scale = new Scale();
+		translate.setOnTransformChanged(e -> worldToLocal = translate.createConcatenation(scale));
+		scale.setOnTransformChanged(e -> worldToLocal = translate.createConcatenation(scale));
 
 		mi = new GraphItem();
-		mi.setTranslateX(400);
-		mi.setTranslateY(400);
+		mi.getTransforms().add(translate);
 		mi.getTransforms().add(scale);
-
 		view.getChildren().add(mi);
 	}
 
@@ -33,8 +42,17 @@ public class ViewController {
 	private void onScroll(ScrollEvent e) {
 		scale.setX(scale.getX() + (scale.getX() * e.getDeltaY() / 1000));
 		scale.setY(scale.getY() + (scale.getY() * e.getDeltaY() / 1000));
-		System.out.println("view:  " + view.getLayoutBounds());
-		mi.update();
+		System.out.println("view in world space: " + localToWorld(view.getLayoutBounds()));
+		mi.update(localToWorld(view.getLayoutBounds()));
 	}
 
+	public Bounds localToWorld(Bounds b) {
+		Bounds world = null;
+		try {
+			world = worldToLocal.inverseTransform(b);
+		} catch (NonInvertibleTransformException e) {
+			e.printStackTrace();
+		}
+		return world;
+	}
 }
