@@ -2,8 +2,12 @@ package nl.tudelft.dnainator.ui.controllers;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.input.TransferMode;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
@@ -24,6 +28,7 @@ public class ViewController {
 	private Transform worldToLocal;
 
 	private ModelItem mi;
+	private Point2D dragstart;
 
 	@FXML
 	private void initialize() {
@@ -37,6 +42,25 @@ public class ViewController {
 		mi.getTransforms().add(translate);
 		mi.getTransforms().add(scale);
 		view.getChildren().add(mi);
+	}
+
+	@FXML
+	private void onMouseDragged(MouseEvent e) {
+		if (e.getButton() == MouseButton.PRIMARY) {
+			Point2D end = new Point2D(e.getX(), e.getY());
+			Point2D delta = end.subtract(dragstart);
+			translate.setX(translate.getX() + delta.getX());
+			translate.setY(translate.getY() + delta.getY());
+
+			dragstart = end;
+		}
+	}
+
+	@FXML
+	private void onMousePressed(MouseEvent e) {
+		if (e.getButton() == MouseButton.PRIMARY) {
+			dragstart = new Point2D(e.getX(), e.getY());
+		}
 	}
 
 	@FXML
