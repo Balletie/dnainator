@@ -28,7 +28,7 @@ public abstract class ModelItem extends Pane {
 	}
 
 	public abstract Transform getRootToItem();
-	
+
 	public Bounds localToRoot(Bounds b) {
 		return getRootToItem().transform(b);
 	}

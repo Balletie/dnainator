@@ -13,12 +13,12 @@ public abstract class CompositeItem extends ModelItem {
 
 	public CompositeItem(Graph graph) {
 		super(graph);
-		
+
 		childRoot = new Group();
 		children = new ArrayList<>();
 		getChildren().add(childRoot);
 	}
-	
+
 	public Group getChildRoot() {
 		return childRoot;
 	}
@@ -26,15 +26,15 @@ public abstract class CompositeItem extends ModelItem {
 	public void setChildRoot(Group childroot) {
 		this.childRoot = childroot;
 	}
-	
+
 	public List<ModelItem> getChildItems() {
 		return children;
 	}
-	
+
 	public void setChildItems(List<ModelItem> childItems) {
 		this.children = childItems;
 	}
-	
+
 	protected void update(double threshold) {
 		if (localToRoot(new Rectangle(100, 1).getBoundsInLocal()).getWidth() < threshold) {
 			getContent().setVisible(true);

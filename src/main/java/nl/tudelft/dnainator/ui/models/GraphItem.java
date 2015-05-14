@@ -5,29 +5,32 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Transform;
-import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
+import nl.tudelft.dnainator.graph.impl.Neo4jSingleton;
 
 public class GraphItem extends CompositeItem {
 	private ObjectProperty<Transform> rootToItem;
 
-	
+
 	public GraphItem() {
-		super((Neo4jGraph) null);
-		
+		super(Neo4jSingleton.getInstance().getDatabase());
+
 		rootToItem = new SimpleObjectProperty<>();
 		rootToItem.bind(localToParentTransformProperty());
 
 		setContent(new Rectangle(1000, 20, Color.BLACK));
-		
+
 		ModelItem mi;
 		mi = new ClusterItem(rootToItem);
 		mi.setTranslateX(0);
 		getChildItems().add(mi);
 		mi = new ClusterItem(rootToItem);
-		mi.setTranslateX(300);
+		mi.setTranslateX(100);
 		getChildItems().add(mi);
 		mi = new ClusterItem(rootToItem);
-		mi.setTranslateX(600);
+		mi.setTranslateX(200);
+		getChildItems().add(mi);
+		mi = new ClusterItem(rootToItem);
+		mi.setTranslateX(300);
 		getChildItems().add(mi);
 	}
 
@@ -38,6 +41,6 @@ public class GraphItem extends CompositeItem {
 
 	@Override
 	public void update() {
-		update(150);
+		update(300);
 	}
 }

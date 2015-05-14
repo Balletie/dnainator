@@ -6,13 +6,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.transform.Transform;
-import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
+import nl.tudelft.dnainator.graph.impl.Neo4jSingleton;
 
 public class ClusterItem extends CompositeItem {
 	private ObjectProperty<Transform> rootToItem;
 
 	public ClusterItem(ObjectProperty<Transform> parent) {
-		super((Neo4jGraph) null);
+		super(Neo4jSingleton.getInstance().getDatabase());
 
 		rootToItem = new SimpleObjectProperty<>();
 		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
@@ -27,16 +27,19 @@ public class ClusterItem extends CompositeItem {
 		rootToItem.bind(transform);
 
 		setContent(new Circle(20, Color.BLUE));
-		
+
 		ModelItem mi;
 		mi = new SequenceItem(rootToItem);
 		mi.setTranslateX(0);
 		getChildItems().add(mi);
 		mi = new SequenceItem(rootToItem);
-		mi.setTranslateX(100);
+		mi.setTranslateX(25);
 		getChildItems().add(mi);
 		mi = new SequenceItem(rootToItem);
-		mi.setTranslateX(200);
+		mi.setTranslateX(50);
+		getChildItems().add(mi);
+		mi = new SequenceItem(rootToItem);
+		mi.setTranslateX(75);
 		getChildItems().add(mi);
 	}
 
@@ -44,9 +47,9 @@ public class ClusterItem extends CompositeItem {
 	public Transform getRootToItem() {
 		return rootToItem.get();
 	}
-	
+
 	@Override
 	public void update() {
-		update(300);
+		update(1000);
 	}
 }

@@ -6,14 +6,14 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.transform.Transform;
-import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
+import nl.tudelft.dnainator.graph.impl.Neo4jSingleton;
 
 
 public class SequenceItem extends ModelItem {
 	private ObjectProperty<Transform> rootToItem;
-	
+
 	public SequenceItem(ObjectProperty<Transform> parent) {
- 		super((Neo4jGraph) null);
+		super(Neo4jSingleton.getInstance().getDatabase());
 
 		rootToItem = new SimpleObjectProperty<>();
 		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
@@ -27,17 +27,17 @@ public class SequenceItem extends ModelItem {
 		};
 		rootToItem.bind(transform);
 
-		setContent(new Circle(20, Color.ORANGE));
+		setContent(new Circle(5, Color.ORANGE));
 	}
 
 	@Override
 	public Transform getRootToItem() {
 		return rootToItem.get();
 	}
-	
+
 	@Override
 	public void update() {
 		// TODO Auto-generated method stub
-		
+
 	}
 }
