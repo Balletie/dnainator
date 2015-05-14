@@ -8,7 +8,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.transform.Transform;
 import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
 
-public class ClusterItem extends ModelItem {
+public class ClusterItem extends CompositeItem {
 	private ObjectProperty<Transform> rootToItem;
 
 	public ClusterItem(ObjectProperty<Transform> parent) {

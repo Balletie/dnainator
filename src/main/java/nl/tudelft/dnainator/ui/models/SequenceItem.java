@@ -37,6 +37,7 @@ public class SequenceItem extends ModelItem {
 	
 	@Override
 	public void update() {
-		update(600);
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -7,7 +7,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Transform;
 import nl.tudelft.dnainator.graph.impl.Neo4jGraph;
 
-public class GraphItem extends ModelItem {
+public class GraphItem extends CompositeItem {
 	private ObjectProperty<Transform> rootToItem;
 
 	
@@ -34,5 +34,10 @@ public class GraphItem extends ModelItem {
 	@Override
 	public Transform getRootToItem() {
 		return rootToItem.get();
+	}
+
+	@Override
+	public void update() {
+		update(150);
 	}
 }
