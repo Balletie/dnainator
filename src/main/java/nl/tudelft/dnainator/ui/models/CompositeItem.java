@@ -3,9 +3,10 @@ package nl.tudelft.dnainator.ui.models;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Transform;
 import nl.tudelft.dnainator.graph.Graph;
 
 public abstract class CompositeItem extends ModelItem {

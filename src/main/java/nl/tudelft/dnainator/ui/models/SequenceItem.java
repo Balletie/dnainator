@@ -2,7 +2,6 @@ package nl.tudelft.dnainator.ui.models;
 
 import java.util.List;
 
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -18,17 +17,7 @@ public class SequenceItem extends ModelItem {
 	public SequenceItem(ObjectProperty<Transform> parent) {
 		super(Neo4jSingleton.getInstance().getDatabase());
 
-		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
-			{
-				super.bind(parent);
-				super.bind(localToParentTransformProperty());
-			}
-			@Override
-			protected Transform computeValue() {
-				return parent.get().createConcatenation(getLocalToParentTransform());
-			}
-		};
-		rootToItemProperty().bind(transform);
+		bindLocalToRoot(parent);
 	}
 
 	@Override

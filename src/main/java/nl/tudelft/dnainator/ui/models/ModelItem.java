@@ -1,5 +1,6 @@
 package nl.tudelft.dnainator.ui.models;
 
+import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Bounds;
@@ -25,7 +26,7 @@ import nl.tudelft.dnainator.graph.Graph;
 public abstract class ModelItem extends Pane {
 	private Graph graph;
 	private Group content;
-	private ObjectProperty<Transform> rootToItem;
+	private ObjectProperty<Transform> localToRoot;
 
 	/**
 	 * Base constructor for a {@link ModelItem}.
@@ -35,9 +36,28 @@ public abstract class ModelItem extends Pane {
 	public ModelItem(Graph graph) {
 		this.graph = graph;
 		this.content = new Group();
-		this.rootToItem = new SimpleObjectProperty<>();
+		this.localToRoot = new SimpleObjectProperty<>();
 
 		getChildren().add(content);
+	}
+
+	/**
+	 * This method binds localToRoot to the concatenated transforms of the parent and child.
+	 * Every subclass, except the root, should bind it's parent for correct positioning.
+	 * @param parent	the parent transform
+	 */
+	public void bindLocalToRoot(ObjectProperty<Transform> parent) {
+		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
+			{
+				super.bind(parent);
+				super.bind(localToParentTransformProperty());
+			}
+			@Override
+			protected Transform computeValue() {
+				return parent.get().createConcatenation(getLocalToParentTransform());
+			}
+		};
+		localToRootProperty().bind(transform);
 	}
 
 	/**
@@ -69,24 +89,24 @@ public abstract class ModelItem extends Pane {
 	 * Return the concatenation of transforms from the root to this item.
 	 * @return	a concatenation of transforms
 	 */
-	public Transform getRootToItem() {
-		return rootToItem.get();
+	public Transform getLocalToRoot() {
+		return localToRoot.get();
 	}
 
 	/**
 	 * Set the concatenation of transforms from the root to this item.
 	 * @param t	a concatenation of transforms
 	 */
-	public void setRootToItem(Transform t) {
-		rootToItem.set(t);
+	public void setLocalToRoot(Transform t) {
+		localToRoot.set(t);
 	}
 
 	/**
 	 * Return the property containing the concatenation of transforms from the root to this item.
 	 * @return	a concatenation of transforms
 	 */
-	public ObjectProperty<Transform> rootToItemProperty() {
-		return rootToItem;
+	public ObjectProperty<Transform> localToRootProperty() {
+		return localToRoot;
 	}
 
 	/**
@@ -95,7 +115,7 @@ public abstract class ModelItem extends Pane {
 	 * @return	the transformed bounds
 	 */
 	public Bounds localToRoot(Bounds b) {
-		return getRootToItem().transform(b);
+		return getLocalToRoot().transform(b);
 	}
 
 	/**

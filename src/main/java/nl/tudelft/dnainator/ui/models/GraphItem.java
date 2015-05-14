@@ -10,21 +10,21 @@ public class GraphItem extends CompositeItem {
 	public GraphItem() {
 		super(Neo4jSingleton.getInstance().getDatabase());
 
-		rootToItemProperty().set(new Translate());
+		localToRootProperty().set(new Translate());
 
 		setContent(new Rectangle(1000, 20, Color.BLACK));
 
 		ModelItem mi;
-		mi = new ClusterItem(rootToItemProperty());
+		mi = new ClusterItem(localToRootProperty());
 		mi.setTranslateX(0);
 		getChildItems().add(mi);
-		mi = new ClusterItem(rootToItemProperty());
+		mi = new ClusterItem(localToRootProperty());
 		mi.setTranslateX(100);
 		getChildItems().add(mi);
-		mi = new ClusterItem(rootToItemProperty());
+		mi = new ClusterItem(localToRootProperty());
 		mi.setTranslateX(200);
 		getChildItems().add(mi);
-		mi = new ClusterItem(rootToItemProperty());
+		mi = new ClusterItem(localToRootProperty());
 		mi.setTranslateX(300);
 		getChildItems().add(mi);
 	}

@@ -1,6 +1,5 @@
 package nl.tudelft.dnainator.ui.models;
 
-import javafx.beans.binding.ObjectBinding;
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
@@ -12,31 +11,21 @@ public class ClusterItem extends CompositeItem {
 	public ClusterItem(ObjectProperty<Transform> parent) {
 		super(Neo4jSingleton.getInstance().getDatabase());
 
-		ObjectBinding<Transform> transform = new ObjectBinding<Transform>() {
-			{
-				super.bind(parent);
-				super.bind(localToParentTransformProperty());
-			}
-			@Override
-			protected Transform computeValue() {
-				return parent.get().createConcatenation(getLocalToParentTransform());
-			}
-		};
-		rootToItemProperty().bind(transform);
+		bindLocalToRoot(parent);
 
 		setContent(new Circle(20, Color.BLUE));
 
 		ModelItem mi;
-		mi = new SequenceItem(rootToItemProperty());
+		mi = new SequenceItem(localToRootProperty());
 		mi.setTranslateX(0);
 		getChildItems().add(mi);
-		mi = new SequenceItem(rootToItemProperty());
+		mi = new SequenceItem(localToRootProperty());
 		mi.setTranslateX(25);
 		getChildItems().add(mi);
-		mi = new SequenceItem(rootToItemProperty());
+		mi = new SequenceItem(localToRootProperty());
 		mi.setTranslateX(50);
 		getChildItems().add(mi);
-		mi = new SequenceItem(rootToItemProperty());
+		mi = new SequenceItem(localToRootProperty());
 		mi.setTranslateX(75);
 		getChildItems().add(mi);
 	}
