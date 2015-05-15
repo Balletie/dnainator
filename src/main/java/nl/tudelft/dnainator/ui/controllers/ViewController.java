@@ -61,6 +61,7 @@ public class ViewController {
 
 			translate.setX(translate.getX() + delta.getX());
 			translate.setY(translate.getY() + delta.getY());
+			mi.update(cameraToWorld(view.getLayoutBounds()));
 
 			dragstart = end;
 		}
