@@ -119,7 +119,7 @@ public abstract class ModelItem extends Pane {
 	}
 
 	public boolean isInViewport(Bounds b) {
-		return b.contains(localToRoot(getContent().getBoundsInLocal()));
+		return b.intersects(localToRoot(getContent().getBoundsInLocal()));
 	}
 
 	/**
