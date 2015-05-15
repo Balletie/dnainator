@@ -43,7 +43,7 @@ public abstract class ModelItem extends Pane {
 
 	/**
 	 * This method binds localToRoot to the concatenated transforms of the parent and child.
-	 * Every subclass, except the root, should bind it's parent for correct positioning.
+	 * Every subclass, except the root, should bind its parent for correct positioning.
 	 * @param parent	the parent transform
 	 */
 	public void bindLocalToRoot(ObjectProperty<Transform> parent) {

@@ -23,24 +23,34 @@ public class ViewController {
 	@FXML private Group group;
 
 	private Scale scale;
+	private Translate toCenter;
 	private Translate translate;
-	private Transform worldToLocal;
+	private Transform worldToCamera;
 
 	private ModelItem mi;
 	private Point2D dragstart;
 
 	@FXML
 	private void initialize() {
-		translate = new Translate(400, 400);
-		translate.setOnTransformChanged(e -> worldToLocal = translate.createConcatenation(scale));
+		toCenter = new Translate();
+		view.widthProperty().addListener((o, v1, v2) -> toCenter.setX(v2.intValue() / 2));
+		view.heightProperty().addListener((o, v1, v2) -> toCenter.setY(v2.intValue() / 2));
+
+		translate = new Translate();
+		translate.setOnTransformChanged(e -> worldToCamera = worldToLocal());
 
 		scale = new Scale();
-		scale.setOnTransformChanged(e -> worldToLocal = translate.createConcatenation(scale));
+		scale.setOnTransformChanged(e -> worldToCamera = worldToLocal());
 
 		mi = new GraphItem();
-		mi.getTransforms().add(translate);
+		mi.getTransforms().add(toCenter);
 		mi.getTransforms().add(scale);
+		mi.getTransforms().add(translate);
 		view.getChildren().add(mi);
+	}
+
+	private Transform worldToLocal() {
+		return toCenter.createConcatenation(scale).createConcatenation(translate);
 	}
 
 	@FXML
@@ -66,14 +76,14 @@ public class ViewController {
 	private void onScroll(ScrollEvent e) {
 		scale.setX(scale.getX() + (scale.getX() * e.getDeltaY() / 1000));
 		scale.setY(scale.getY() + (scale.getY() * e.getDeltaY() / 1000));
-		System.out.println("view in world space: " + localToWorld(view.getLayoutBounds()));
-		mi.update(localToWorld(view.getLayoutBounds()));
+		System.out.println("view in world space: " + cameraToWorld(view.getLayoutBounds()));
+		mi.update(cameraToWorld(view.getLayoutBounds()));
 	}
 
-	public Bounds localToWorld(Bounds b) {
+	public Bounds cameraToWorld(Bounds b) {
 		Bounds world = null;
 		try {
-			world = worldToLocal.inverseTransform(b);
+			world = worldToCamera.inverseTransform(b);
 		} catch (NonInvertibleTransformException e) {
 			e.printStackTrace();
 		}
