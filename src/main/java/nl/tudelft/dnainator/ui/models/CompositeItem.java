@@ -34,18 +34,4 @@ public abstract class CompositeItem extends ModelItem {
 	public void setChildItems(List<ModelItem> childItems) {
 		this.children = childItems;
 	}
-
-	protected void update(Bounds b, double threshold) {
-		if (b.getWidth() > threshold) {
-			getContent().setVisible(true);
-			getChildRoot().getChildren().clear();
-		} else {
-			getContent().setVisible(false);
-			getChildRoot().getChildren().clear(); // FIXME
-			getChildRoot().getChildren().addAll(getChildItems());
-			for (ModelItem m : children) {
-				m.update(b);
-			}
-		}
-	}
 }

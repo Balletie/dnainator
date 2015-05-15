@@ -58,6 +58,7 @@ public class ViewController {
 		if (e.getButton() == MouseButton.PRIMARY) {
 			Point2D end = new Point2D(e.getX(), e.getY());
 			Point2D delta = end.subtract(dragstart);
+
 			translate.setX(translate.getX() + delta.getX());
 			translate.setY(translate.getY() + delta.getY());
 

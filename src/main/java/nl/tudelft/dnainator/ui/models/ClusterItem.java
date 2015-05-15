@@ -14,24 +14,30 @@ public class ClusterItem extends CompositeItem {
 		bindLocalToRoot(parent);
 
 		setContent(new Circle(20, Color.BLUE));
-
-		ModelItem mi;
-		mi = new SequenceItem(localToRootProperty());
-		mi.setTranslateX(0);
-		getChildItems().add(mi);
-		mi = new SequenceItem(localToRootProperty());
-		mi.setTranslateX(25);
-		getChildItems().add(mi);
-		mi = new SequenceItem(localToRootProperty());
-		mi.setTranslateX(50);
-		getChildItems().add(mi);
-		mi = new SequenceItem(localToRootProperty());
-		mi.setTranslateX(75);
-		getChildItems().add(mi);
 	}
 
 	@Override
 	public void update(Bounds b) {
-		update(b, 300);
+		if (!isInViewport(b)) return;
+
+		if (b.getWidth() > 600) {
+			getContent().setVisible(true);
+			getChildRoot().getChildren().clear();
+		} else {
+			if (!getContent().isVisible()) return;
+
+			getContent().setVisible(false);
+
+			for (int i = 0; i < 10; i++) {
+				SequenceItem si = new SequenceItem(localToRootProperty());
+				si.setTranslateX(i * 10);
+				getChildItems().add(si);
+				getChildRoot().getChildren().add(si);
+			}
+
+			for (ModelItem m : getChildItems()) {
+				m.update(b);
+			}
+		}
 	}
 }

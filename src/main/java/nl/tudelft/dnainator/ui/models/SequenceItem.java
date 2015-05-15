@@ -22,13 +22,15 @@ public class SequenceItem extends ModelItem {
 
 	@Override
 	public void update(Bounds b) {
-		int rank = (int) localToRoot(new Rectangle().getBoundsInLocal()).getMinX() / 25;
+		if (!isInViewport(b)) return;
+
+		int rank = (int) localToRoot(new Rectangle().getBoundsInLocal()).getMinX() / 10;
 
 		Group g = new Group();
 		List<SequenceNode> nodes = getGraph().getRank(rank);
 		for (int i = 0; i < nodes.size(); i++) {
-			Circle c = new Circle(10, Color.ORANGE);
-			c.setTranslateY(i * 25);
+			Circle c = new Circle(3, Color.ORANGE);
+			c.setTranslateY(i * 10);
 			g.getChildren().add(c);
 		}
 

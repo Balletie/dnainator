@@ -118,6 +118,10 @@ public abstract class ModelItem extends Pane {
 		return getLocalToRoot().transform(b);
 	}
 
+	public boolean isInViewport(Bounds b) {
+		return b.contains(localToRoot(getContent().getBoundsInLocal()));
+	}
+
 	/**
 	 * Update method that should be called after scaling.
 	 * This method checks how zoomed in we are by transforming bounds to root coordinates,
