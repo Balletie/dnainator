@@ -1,5 +1,6 @@
 package nl.tudelft.dnainator.ui.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.geometry.Bounds;
@@ -11,6 +12,7 @@ import nl.tudelft.dnainator.core.impl.Cluster;
  */
 public class RankItem extends CompositeItem {
 	private List<Cluster> clusters;
+	private List<ClusterItem> children;
 
 	/**
 	 * Construct a new bottom level {@link RankItem} using the default graph.
@@ -23,6 +25,7 @@ public class RankItem extends CompositeItem {
 		super(parent, rank);
 
 		this.clusters = clusters;
+		this.children = new ArrayList<>();
 		getContent().setTranslateX(rank * RANK_WIDTH);
 	}
 
@@ -46,5 +49,10 @@ public class RankItem extends CompositeItem {
 		}
 
 		update(b, Thresholds.GRAPH);
+	}
+
+	@Override
+	public List<ClusterItem> getChildItems() {
+		return children;
 	}
 }

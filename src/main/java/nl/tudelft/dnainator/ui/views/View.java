@@ -12,7 +12,6 @@ import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
 import javafx.scene.transform.Translate;
 import nl.tudelft.dnainator.ui.models.GraphItem;
-import nl.tudelft.dnainator.ui.models.ModelItem;
 import nl.tudelft.dnainator.ui.widgets.contexts.ViewContext;
 import nl.tudelft.dnainator.ui.widgets.dialogs.ExceptionDialog;
 
@@ -25,7 +24,7 @@ public class View extends Pane {
 	private Translate toCenter;
 	private Translate translate;
 
-	private ModelItem mi;
+	private GraphItem mi;
 
 	/**
 	 * Creates a new view instance.

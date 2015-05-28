@@ -1,6 +1,5 @@
 package nl.tudelft.dnainator.ui.models;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.geometry.Bounds;
@@ -14,7 +13,6 @@ import javafx.scene.Group;
  */
 public abstract class CompositeItem extends ModelItem {
 	private Group childContent;
-	private List<ModelItem> children;
 
 	/**
 	 * Base constructor for a {@link CompositeItem}.
@@ -26,7 +24,6 @@ public abstract class CompositeItem extends ModelItem {
 		super(parent, rank);
 
 		childContent = new Group();
-		children = new ArrayList<>();
 		getChildren().add(childContent);
 	}
 
@@ -42,9 +39,7 @@ public abstract class CompositeItem extends ModelItem {
 	 * Return the list of childitems this {@link CompositeItem} has.
 	 * @return	the list of child items
 	 */
-	public List<ModelItem> getChildItems() {
-		return children;
-	}
+	public abstract List<? extends ModelItem> getChildItems();
 
 	/**
 	 * Load the children of this {@link CompositeItem}.

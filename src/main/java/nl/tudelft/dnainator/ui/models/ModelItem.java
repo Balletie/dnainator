@@ -1,7 +1,5 @@
 package nl.tudelft.dnainator.ui.models;
 
-
-
 import java.util.Map;
 
 import javafx.geometry.Bounds;

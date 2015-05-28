@@ -1,5 +1,6 @@
 package nl.tudelft.dnainator.ui.models;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ public class GraphItem extends CompositeItem {
 	private static final int CLUSTER_DIVIDER = 100;
 
 	private Graph graph;
+	private List<RankItem> children;
 	private Map<String, ClusterItem> clusters;
 
 	/**
@@ -37,6 +39,7 @@ public class GraphItem extends CompositeItem {
 	public GraphItem(Graph graph) {
 		super(null, 0);
 		this.graph = graph;
+		this.children = new ArrayList<>();
 		this.clusters = new HashMap<>();
 
 		for (int i = 0; i < FOUR; i++) {
@@ -82,5 +85,10 @@ public class GraphItem extends CompositeItem {
 	@Override
 	public void update(Bounds b) {
 		update(b, Thresholds.GRAPH);
+	}
+
+	@Override
+	public List<RankItem> getChildItems() {
+		return children;
 	}
 }
