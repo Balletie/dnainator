@@ -29,7 +29,6 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
@@ -45,6 +44,7 @@ public final class Neo4jGraph implements Graph {
 	private static final String GET_ROOT = "MATCH (s:" + PropertyTypes.NODELABEL.name() + ") "
 			+ "WHERE NOT (s)<-[:NEXT]-(:" + PropertyTypes.NODELABEL.name() + ") "
 			+ "RETURN s";
+	private static final int TRANSACTION_SIZE = 5000;
 
 	private GraphDatabaseService service;
 	private Label nodeLabel;
@@ -76,12 +76,8 @@ public final class Neo4jGraph implements Graph {
 	 */
 	public void clear() {
 		execute(e -> {
-			for (Relationship r : GlobalGraphOperations.at(e).getAllRelationships()) {
-				r.delete();
-			}
-			for (Node n : GlobalGraphOperations.at(e).getAllNodes()) {
-				n.delete();
-			}
+			GlobalGraphOperations.at(e).getAllRelationships().forEach(r -> r.delete());
+			GlobalGraphOperations.at(e).getAllNodes().forEach(r -> r.delete());
 		});
 	}
 
@@ -122,10 +118,16 @@ public final class Neo4jGraph implements Graph {
 	@Override
 	public void constructGraph(NodeParser np, EdgeParser ep)
 			throws IOException, ParseException {
-		try (Transaction tx = service.beginTx()) {
-			while (np.hasNext()) {
-				addNode(np.next());
+		while (np.hasNext()) {
+			try (Transaction tx = service.beginTx()) {
+				for (int i = 0; i < TRANSACTION_SIZE && np.hasNext(); i++) {
+					addNode(np.next());
+				}
+				tx.success();
 			}
+		}
+
+		try (Transaction tx = service.beginTx()) {
 			while (ep.hasNext()) {
 				addEdge(ep.next());
 			}
