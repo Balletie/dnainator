@@ -2,6 +2,7 @@ package nl.tudelft.dnainator.graph.impl;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
@@ -44,7 +46,7 @@ public final class Neo4jGraph implements Graph {
 	private static final String GET_ROOT = "MATCH (s:" + PropertyTypes.NODELABEL.name() + ") "
 			+ "WHERE NOT (s)<-[:NEXT]-(:" + PropertyTypes.NODELABEL.name() + ") "
 			+ "RETURN s";
-	private static final int TRANSACTION_SIZE = 5000;
+	private static final int TRANSACTION_SIZE = 10000;
 
 	private GraphDatabaseService service;
 	private Label nodeLabel;
@@ -73,12 +75,35 @@ public final class Neo4jGraph implements Graph {
 
 	/**
 	 * Delete all nodes and relationships from this graph.
+	 * FIXME: Should be replaced by batchinserter code
 	 */
 	public void clear() {
-		execute(e -> {
-			GlobalGraphOperations.at(e).getAllRelationships().forEach(r -> r.delete());
-			GlobalGraphOperations.at(e).getAllNodes().forEach(r -> r.delete());
-		});
+		boolean cont;
+
+		cont = true;
+		while (cont) {
+			try (Transaction tx = service.beginTx()) {
+				Iterator<Relationship> edges = GlobalGraphOperations.at(service)
+								.getAllRelationships().iterator();
+				for (int i = 0; edges.hasNext() && i < 2 * TRANSACTION_SIZE; i++) {
+					edges.next().delete();
+				}
+				cont = edges.hasNext();
+				tx.success();
+			}
+		}
+		cont = true;
+		while (cont) {
+			try (Transaction tx = service.beginTx()) {
+				ResourceIterator<Node> nodes = GlobalGraphOperations.at(service)
+								.getAllNodes().iterator();
+				for (int i = 0; nodes.hasNext() && i < TRANSACTION_SIZE; i++) {
+					nodes.next().delete();
+				}
+				cont = nodes.hasNext();
+				tx.success();
+			}
+		}
 	}
 
 	@Override
@@ -125,6 +150,7 @@ public final class Neo4jGraph implements Graph {
 				}
 				tx.success();
 			}
+			System.out.println("node batch!");
 		}
 
 		try (Transaction tx = service.beginTx()) {
