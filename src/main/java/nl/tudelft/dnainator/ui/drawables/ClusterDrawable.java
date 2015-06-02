@@ -1,6 +1,8 @@
 package nl.tudelft.dnainator.ui.drawables;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -28,6 +30,12 @@ public class ClusterDrawable extends Group {
 		shape.setOnMouseClicked(e -> System.out.println(clustered));
 		Text label = new Text(Integer.toString(clustered.size()));
 		label.setStyle("-fx-font-size: 2pt");
+		Set<String> collect = clustered.stream()
+					.flatMap(e -> e.getSources().stream())
+					.collect(Collectors.toSet());
+		if (collect.contains("TKK_REF")) {
+			shape.setStyle("-fx-fill: #ff0000");
+		}
 
 		getChildren().add(shape);
 		getChildren().add(label);
