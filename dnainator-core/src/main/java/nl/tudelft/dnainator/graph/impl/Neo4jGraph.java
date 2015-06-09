@@ -222,6 +222,7 @@ public final class Neo4jGraph implements Graph, AnnotationCollection {
 			ResourceIterator<Node> nodes = service.execute(GET_RANGE, parameters).columnAs("n");
 			nodes.forEachRemaining(n -> n.createRelationshipTo(annotation, RelTypes.ANNOTATED));
 		});
+		System.out.println("Finished loading annotations.");
 	}
 
 	@Override

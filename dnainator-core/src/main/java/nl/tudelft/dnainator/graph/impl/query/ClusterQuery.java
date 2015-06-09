@@ -1,5 +1,13 @@
 package nl.tudelft.dnainator.graph.impl.query;
 
+import static nl.tudelft.dnainator.graph.impl.PropertyTypes.ID;
+import static nl.tudelft.dnainator.graph.impl.PropertyTypes.RANK;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import nl.tudelft.dnainator.annotation.Annotation;
 import nl.tudelft.dnainator.core.SequenceNode;
 import nl.tudelft.dnainator.core.impl.Cluster;
@@ -11,14 +19,6 @@ import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.traversal.TraversalDescription;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static nl.tudelft.dnainator.graph.impl.PropertyTypes.ID;
-import static nl.tudelft.dnainator.graph.impl.PropertyTypes.RANK;
 
 /**
  * The {@link ClusterQuery} creates one single {@link Cluster} from all nodes,
@@ -71,10 +71,9 @@ public class ClusterQuery implements Query<Cluster> {
 		// Might want to internally pass nodes.
 		List<SequenceNode> retrieve = result.stream().map(e -> new Neo4jSequenceNode(service, e))
 						.collect(Collectors.toList());
-		List<String> annotations = retrieve.stream().flatMap(e -> e.getAnnotations().stream())
+		List<Annotation> annotations = retrieve.stream().flatMap(e -> e.getAnnotations().stream())
 						.collect(Collectors.toList());
 		cluster = new Cluster(rankStart, retrieve, annotations);
-
 		return cluster;
 	}
 }
