@@ -10,5 +10,7 @@ public enum NodeLabels implements Label {
 	ANNOTATION,
 	DRUGRESISTANCE,
 	SOURCE,
-	NODE
+	NODE,
+	BUBBLE_SOURCE,
+	BUBBLE_SINK
 }
