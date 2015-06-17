@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,13 +29,16 @@ import java.util.stream.IntStream;
 public class TopologicalPathExpander implements PathExpander<Object> {
 	private static final String PROCESSED = "PROCESSED";
 	private static final String BUBBLE_SOURCE_IDS = "BUBBLE_SOURCE_IDS";
-	private HashMap<Long, Integer> bubbleSourceIDtoNumEdges;
+	private Map<Long, Integer> bubbleSourceIDtoNumEdges;
+	private Map<Long, Set<Long>> bubbleSourceIDtoEndIDs;
+
 
 	/**
 	 * Constructs a new {@link TopologicalPathExpander}.
 	 */
 	public TopologicalPathExpander() {
 		this.bubbleSourceIDtoNumEdges = new HashMap<>();
+		this.bubbleSourceIDtoEndIDs = new HashMap<>();
 	}
 
 	private boolean hasUnprocessedIncoming(Node n) {
@@ -93,8 +97,16 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 		Set<Long> propagatedUnique = new HashSet<Long>(propagatedSources);
 		printCurrentNumPaths(n);
 		propagatedUnique.forEach(id -> {
-			if (bubbleSourceIDtoNumEdges.get(id) != null) {
-				bubbleSourceIDtoNumEdges.put(id, bubbleSourceIDtoNumEdges.get(id) + degreeDiff);
+			Integer numEdges = bubbleSourceIDtoNumEdges.get(id);
+			Set<Long> pathEndIDs = bubbleSourceIDtoEndIDs.get(id);
+			if (numEdges != null) {
+				bubbleSourceIDtoNumEdges.put(id, numEdges + degreeDiff);
+			}
+			if (pathEndIDs != null) {
+				pathEndIDs.remove(n.getId());
+				// FIXME: we add twice here in most cases.
+				n.getRelationships(RelTypes.NEXT, Direction.OUTGOING)
+					.forEach(rel -> pathEndIDs.add(rel.getEndNode().getId()));
 			}
 		});
 		return propagatedUnique;
@@ -117,6 +129,10 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 			toPropagate.add(newSourceID);
 			bubbleSourceIDtoNumEdges.put(newSourceID,
 					bubbleSourceIDtoNumEdges.getOrDefault(newSourceID, 0) + outDegree);
+			Set<Long> pathEnds = new HashSet<>(outDegree);
+			n.getRelationships(RelTypes.NEXT, Direction.OUTGOING)
+				.forEach(rel -> pathEnds.add(rel.getEndNode().getId()));
+			bubbleSourceIDtoEndIDs.put(newSourceID, pathEnds);
 		}
 	}
 
@@ -143,15 +159,17 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 						+ " -> " + in.getEndNode().getProperty(SequenceProperties.ID.name()));
 
 				for (long sourceID : (long[]) in.getProperty(BUBBLE_SOURCE_IDS)) {
-					if (bubbleSourceIDtoNumEdges.get(sourceID) <= degree) {
+					if (bubbleSourceIDtoNumEdges.get(sourceID) <= degree
+							&& bubbleSourceIDtoEndIDs.get(sourceID).size() == 1) {
 						bubbleSourceID.add(sourceID);
 					}
 				}
 			}
 			bubbleSourceID.forEach(id -> {
-				//if (bubbleSourceIDtoNumEdges.get(id) == degree) {
-					//bubbleSourceIDtoNumEdges.remove(id);
-				//}
+				if (bubbleSourceIDtoNumEdges.get(id) == degree
+						&& bubbleSourceIDtoEndIDs.get(id).size() == 1) {
+					bubbleSourceIDtoNumEdges.remove(id);
+				}
 				Node bubbleSource = n.getGraphDatabase().getNodeById(id);
 				System.out.println("bubble: " + bubbleSource.getProperty("ID")
 						+ " " + n.getProperty("ID"));
