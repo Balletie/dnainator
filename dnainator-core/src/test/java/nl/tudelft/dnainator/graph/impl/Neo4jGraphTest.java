@@ -73,9 +73,6 @@ public class Neo4jGraphTest {
 			db = (Neo4jGraph) new Neo4jBatchBuilder(DB_PATH, new AnnotationCollectionImpl())
 				.constructGraph(np, ep)
 				.build();
-			System.out.println();
-			System.out.println("===");
-			System.out.println();
 		} catch (IOException e) {
 			fail("Couldn't initialize DB");
 		} catch (ParseException e) {
