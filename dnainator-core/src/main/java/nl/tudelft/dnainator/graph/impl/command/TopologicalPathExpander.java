@@ -13,7 +13,6 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.BranchState;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -55,30 +54,34 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 	public Iterable<Relationship> expand(Path path,
 			BranchState<Object> noState) {
 		Node from = path.endNode();
-		createBubbleSource(from);
+
+		Set<Long> toPropagate = getSourcesToPropagate(from);
+		createBubbleSource(from, toPropagate);
+		from.getRelationships(RelTypes.NEXT, Direction.OUTGOING)
+			.forEach(out -> propagateSourceIDs(toPropagate, out));
+
 		List<Relationship> expand = new LinkedList<>();
-		for (Relationship r : from.getRelationships(RelTypes.NEXT, Direction.OUTGOING)) {
-			setNumStrainsThrough(r);
-			r.setProperty(PROCESSED, true);
-			if (!hasUnprocessedIncoming(r.getEndNode())) {
-				createBubbleSink(r.getEndNode());
+		for (Relationship out : from.getRelationships(RelTypes.NEXT, Direction.OUTGOING)) {
+			setNumStrainsThrough(out);
+			out.setProperty(PROCESSED, true);
+			if (!hasUnprocessedIncoming(out.getEndNode())) {
+				createBubbleSink(out.getEndNode());
 				// All of the dependencies of this node have been added to the result.
-				expand.add(r);
+				expand.add(out);
 			}
 		}
 		return expand;
 	}
 
-	private void createBubbleSource(Node n) {
+	private Set<Long> getSourcesToPropagate(Node n) {
 		Iterable<Relationship> ins = n.getRelationships(RelTypes.NEXT, Direction.INCOMING);
 		int outDegree = n.getDegree(RelTypes.NEXT, Direction.OUTGOING);
 		int inDegree = n.getDegree(RelTypes.NEXT, Direction.INCOMING);
 		int degreeDiff = outDegree - inDegree;
-		boolean newSource = outDegree >= 2;
 
 		List<Long> propagatedSources = new ArrayList<>();
 		for (Relationship in : ins) {
-			long[] oldSources = (long[]) in.getProperty(BUBBLE_SOURCE_IDS);
+			long[] oldSources = (long[]) in.removeProperty(BUBBLE_SOURCE_IDS);
 			IntStream.range(0, oldSources.length)
 					.mapToObj(i -> oldSources[i])
 					.forEach(id -> {
@@ -88,35 +91,36 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 					});
 		}
 		Set<Long> propagatedUnique = new HashSet<Long>(propagatedSources);
+		printCurrentNumPaths(n);
+		propagatedUnique.forEach(id -> {
+			if (bubbleSourceIDtoNumEdges.get(id) != null) {
+				bubbleSourceIDtoNumEdges.put(id, bubbleSourceIDtoNumEdges.get(id) + degreeDiff);
+			}
+		});
+		return propagatedUnique;
+	}
 
-		// begin testprint
+	private void printCurrentNumPaths(Node n) {
 		System.out.print("at " + n.getProperty(SequenceProperties.ID.name()) + ": ");
 		for (Entry<Long, Integer> e : bubbleSourceIDtoNumEdges.entrySet()) {
 			Node source = n.getGraphDatabase().getNodeById(e.getKey());
 			System.out.print(source.getProperty("ID") + " = " + e.getValue() + " paths, ");
 		}
 		System.out.println();
-		// end testprint
-
-		propagatedUnique.forEach(id -> {
-			if (bubbleSourceIDtoNumEdges.get(id) != null) {
-				bubbleSourceIDtoNumEdges.put(id, bubbleSourceIDtoNumEdges.get(id) + degreeDiff);
-			}
-		});
-
-		for (Relationship out : n.getRelationships(RelTypes.NEXT, Direction.OUTGOING)) {
-			propagateSourceIDs(propagatedUnique, out, newSource, n.getId());
-		}
-		n.addLabel(NodeLabels.BUBBLE_SOURCE);
 	}
 
-	private void propagateSourceIDs(Set<Long> propagatedUnique, Relationship out,
-			boolean newSource, long newSourceID) {
-		if (newSource) {
-			propagatedUnique.add(newSourceID);
+	private void createBubbleSource(Node n, Set<Long> toPropagate) {
+		int outDegree = n.getDegree(RelTypes.NEXT, Direction.OUTGOING);
+		if (outDegree >= 2) {
+			n.addLabel(NodeLabels.BUBBLE_SOURCE);
+			long newSourceID = n.getId();
+			toPropagate.add(newSourceID);
 			bubbleSourceIDtoNumEdges.put(newSourceID,
-					bubbleSourceIDtoNumEdges.getOrDefault(newSourceID, 0) + 1);
+					bubbleSourceIDtoNumEdges.getOrDefault(newSourceID, 0) + outDegree);
 		}
+	}
+
+	private void propagateSourceIDs(Set<Long> propagatedUnique, Relationship out) {
 		GraphDatabaseService s = out.getEndNode().getGraphDatabase();
 		System.out.println("set "
 				+ propagatedUnique.stream().map(l -> s.getNodeById(l).getProperty("ID"))
@@ -145,9 +149,9 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 				}
 			}
 			bubbleSourceID.forEach(id -> {
-				if (bubbleSourceIDtoNumEdges.get(id) == degree) {
-					bubbleSourceIDtoNumEdges.remove(id);
-				}
+				//if (bubbleSourceIDtoNumEdges.get(id) == degree) {
+					//bubbleSourceIDtoNumEdges.remove(id);
+				//}
 				Node bubbleSource = n.getGraphDatabase().getNodeById(id);
 				System.out.println("bubble: " + bubbleSource.getProperty("ID")
 						+ " " + n.getProperty("ID"));
