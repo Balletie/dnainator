@@ -5,38 +5,34 @@ import nl.tudelft.dnainator.graph.impl.RelTypes;
 import nl.tudelft.dnainator.graph.impl.properties.SequenceProperties;
 
 import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
 import org.neo4j.graphdb.PathExpander;
 import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.traversal.BranchState;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * PathExpander for determining the topological ordering.
  */
 public class TopologicalPathExpander implements PathExpander<Object> {
 	private static final String PROCESSED = "PROCESSED";
-	private static final String BUBBLE_SOURCE_IDS = "BUBBLE_SOURCE_IDS";
+	private Map<Long, Set<Long>> relIDtoSourceIDs;
 	private Map<Long, Integer> bubbleSourceIDtoNumEdges;
 	private Map<Long, Set<Long>> bubbleSourceIDtoEndIDs;
-
 
 	/**
 	 * Constructs a new {@link TopologicalPathExpander}.
 	 */
 	public TopologicalPathExpander() {
+		this.relIDtoSourceIDs = new HashMap<>();
 		this.bubbleSourceIDtoNumEdges = new HashMap<>();
 		this.bubbleSourceIDtoEndIDs = new HashMap<>();
 	}
@@ -83,19 +79,13 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 		int inDegree = n.getDegree(RelTypes.NEXT, Direction.INCOMING);
 		int degreeDiff = outDegree - inDegree;
 
-		List<Long> propagatedSources = new ArrayList<>();
+		Set<Long> propagatedSources = new HashSet<>();
 		for (Relationship in : ins) {
-			long[] oldSources = (long[]) in.removeProperty(BUBBLE_SOURCE_IDS);
-			IntStream.range(0, oldSources.length)
-					.mapToObj(i -> oldSources[i])
-					.forEach(id -> {
-						if (bubbleSourceIDtoNumEdges.get(id) != null) {
-							propagatedSources.add(id);
-						}
-					});
+			propagatedSources.addAll(relIDtoSourceIDs.remove(in.getId()).stream()
+					.filter(source -> bubbleSourceIDtoNumEdges.get(source) != null)
+					.collect(Collectors.toList()));
 		}
-		Set<Long> propagatedUnique = new HashSet<Long>(propagatedSources);
-		propagatedUnique.forEach(id -> {
+		propagatedSources.forEach(id -> {
 			Integer numEdges = bubbleSourceIDtoNumEdges.get(id);
 			Set<Long> pathEndIDs = bubbleSourceIDtoEndIDs.get(id);
 			if (numEdges != null) {
@@ -108,7 +98,7 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 					.forEach(rel -> pathEndIDs.add(rel.getEndNode().getId()));
 			}
 		});
-		return propagatedUnique;
+		return propagatedSources;
 	}
 
 	private void createBubbleSource(Node n, Set<Long> toPropagate) {
@@ -127,8 +117,7 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 	}
 
 	private void propagateSourceIDs(Set<Long> propagatedUnique, Relationship out) {
-		out.setProperty(BUBBLE_SOURCE_IDS, propagatedUnique
-				.stream().mapToLong(l -> l).toArray());
+		relIDtoSourceIDs.put(out.getId(), propagatedUnique);
 	}
 
 	private void createBubbleSink(Node n) {
@@ -137,8 +126,7 @@ public class TopologicalPathExpander implements PathExpander<Object> {
 			Set<Long> bubbleSourceID = new HashSet<>();
 			n.addLabel(NodeLabels.BUBBLE_SINK);
 			for (Relationship in : n.getRelationships(RelTypes.NEXT, Direction.INCOMING)) {
-
-				for (long sourceID : (long[]) in.getProperty(BUBBLE_SOURCE_IDS)) {
+				for (long sourceID : relIDtoSourceIDs.get(in.getId())) {
 					if (bubbleSourceIDtoNumEdges.get(sourceID) <= degree
 							&& bubbleSourceIDtoEndIDs.get(sourceID).size() == 1) {
 						bubbleSourceID.add(sourceID);
